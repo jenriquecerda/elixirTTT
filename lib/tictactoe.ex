@@ -1,29 +1,15 @@
 defmodule TicTacToe do
-  def create_board(size) do
-    list = Enum.to_list(1..size)
-
-    Map.new(list, fn x -> {x, nil} end)
+  def start(board, io) do
+    ask_for_move(board, io)
   end
 
-  def make_selection(board, player, space) do
-    if board[space] != nil do
-      raise NonEmptyError, message: "Cell " <> Integer.to_string(space) <> " is not empty."
-    end
-
-    updated_board = %{board | space => player.character}
-
-    %{:board => updated_board, :players => nil}
-  end
-
-  def current_player([head | tail]) do
-    if head.turn == true do
-      head
+  defp ask_for_move(board, io) do
+    unless Board.is_full?(board) do
+      {space, _} = IO.gets(io, "Please choose space?\n") |> String.trim() |> Integer.parse()
+      updated_board = Board.mark(board, space, "X")
+      ask_for_move(updated_board, io)
     else
-      tail
+      board
     end
   end
-end
-
-defmodule NonEmptyError do
-  defexception message: "Cell already in use."
 end

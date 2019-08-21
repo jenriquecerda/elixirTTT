@@ -2,59 +2,28 @@ defmodule TicTacToeTest do
   use ExUnit.Case
   doctest TicTacToe
 
-  test "it creates empty board" do
-    prototpye_board = %{
-      1 => nil,
-      2 => nil,
-      3 => nil
-    }
+  @empty_board Board.create(3)
 
-    board = TicTacToe.create_board(3)
+  test "it asks for spaces until board is full" do
+    fake_IO = spawn(FakeDevice, :receive_input, [["1", "2", "3"]])
 
-    assert prototpye_board == board
+    updated_board = TicTacToe.start(@empty_board, fake_IO)
+
+    assert Board.get(updated_board, 1) == "X"
+    assert Board.get(updated_board, 2) == "X"
+    assert Board.get(updated_board, 3) == "X"
   end
+end
 
-  test "player can choose space" do
-    player = %Player{character: "X", human: true, turn: true}
-    space = 1
-    board = TicTacToe.create_board(3)
+defmodule FakeDevice do
+  def receive_input(list) do
+    {number, list} = List.pop_at(list, 0)
 
-    updated_board = Map.get(TicTacToe.make_selection(board, player, space), :board)
-
-    assert Map.fetch(updated_board, 1) == {:ok, "X"}
-  end
-
-  test "it cant choose occupied space" do
-    player = %Player{character: "X", human: true, turn: true}
-    space = 1
-    board = TicTacToe.create_board(3)
-
-    board = Map.get(TicTacToe.make_selection(board, player, space), :board)
-
-    assert_raise NonEmptyError, "Cell 1 is not empty.", fn ->
-      TicTacToe.make_selection(board, player, space)
+    receive do
+      {:io_request, caller, reply_as, {_, _, _message}} ->
+        send(caller, {:io_reply, reply_as, number})
     end
-  end
 
-  test "preserves old board positions" do
-    player_one = %Player{character: "X", human: true, turn: true}
-    player_two = %Player{character: "O", human: false, turn: true}
-    board = TicTacToe.create_board(3)
-
-    updated_board = Map.get(TicTacToe.make_selection(board, player_one, 1), :board)
-    updated_board = Map.get(TicTacToe.make_selection(updated_board, player_two, 2), :board)
-
-    assert updated_board == %{1 => "X", 2 => "O", 3 => nil}
-  end
-
-  test "it doesnt allow last player to make movement" do
-    players = [
-      %Player{character: "X", human: true, turn: true},
-      %Player{character: "O", human: false}
-    ]
-
-    player = TicTacToe.current_player(players)
-
-    assert player.character == "X"
+    receive_input(list)
   end
 end
