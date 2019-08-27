@@ -9,9 +9,29 @@ defmodule TicTacToeTest do
 
     updated_board = TicTacToe.start(@empty_board, fake_IO)
 
-    assert Board.get(updated_board, 1) == "X"
-    assert Board.get(updated_board, 2) == "X"
-    assert Board.get(updated_board, 3) == "X"
+    assert Board.get(updated_board, 1) == {:ok, "X"}
+    assert Board.get(updated_board, 2) == {:ok, "X"}
+    assert Board.get(updated_board, 3) == {:ok, "X"}
+  end
+
+  test "it asks again if chosen space is occupied" do
+    fake_IO = spawn(FakeDevice, :receive_input, [["1", "1", "2", "3"]])
+
+    updated_board = TicTacToe.start(@empty_board, fake_IO)
+
+    assert Board.get(updated_board, 1) == {:ok, "X"}
+    assert Board.get(updated_board, 2) == {:ok, "X"}
+    assert Board.get(updated_board, 3) == {:ok, "X"}
+  end
+
+  test "it asks again if chosen space does not exist" do
+    fake_IO = spawn(FakeDevice, :receive_input, [["99", "1", "2", "3"]])
+
+    updated_board = TicTacToe.start(@empty_board, fake_IO)
+
+    assert Board.get(updated_board, 1) == {:ok, "X"}
+    assert Board.get(updated_board, 2) == {:ok, "X"}
+    assert Board.get(updated_board, 3) == {:ok, "X"}
   end
 end
 

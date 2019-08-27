@@ -1,12 +1,4 @@
 defmodule Board do
-  defmodule NonEmptyError do
-    defexception message: "Space already in use."
-  end
-
-  defmodule NonExistingSpace do
-    defexception message: "Space already in use."
-  end
-
   def create(size) do
     list = Enum.to_list(1..size)
 
@@ -14,19 +6,24 @@ defmodule Board do
   end
 
   def get(board, space) do
-    Map.get(board, space)
+    if space > size(board) do
+      {:error, "Space " <> Integer.to_string(space) <> " does not exist in board."}
+    else
+      {:ok, Map.get(board, space)}
+    end
   end
 
   def mark(board, space, mark) do
-    if space > size(board) do
-      raise NonExistingSpace, message: "Space " <> Integer.to_string(space) <> " does not exist in board."
-    end
+    cond do
+      space > size(board) ->
+        {:error, "Space " <> Integer.to_string(space) <> " does not exist in board."}
 
-    if board[space] != nil do
-      raise NonEmptyError, message: "Space " <> Integer.to_string(space) <> " is not empty."
-    end
+      board[space] != nil ->
+        {:error, "Space " <> Integer.to_string(space) <> " is not empty."}
 
-    %{board | space => mark}
+      true ->
+        {:ok, %{board | space => mark}}
+    end
   end
 
   def is_full?(board) do
@@ -39,6 +36,6 @@ defmodule Board do
   end
 
   def size(board) do
-    map_size board
+    map_size(board)
   end
 end

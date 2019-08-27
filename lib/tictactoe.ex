@@ -1,13 +1,19 @@
 defmodule TicTacToe do
+  @default_message "Please choose space.\n"
+
   def start(board, io) do
     ask_for_move(board, io)
   end
 
-  defp ask_for_move(board, io) do
+  defp ask_for_move(board, io, message \\ @default_message) do
     unless Board.is_full?(board) do
-      {space, _} = IO.gets(io, "Please choose space?\n") |> String.trim() |> Integer.parse()
-      updated_board = Board.mark(board, space, "X")
-      ask_for_move(updated_board, io)
+      {space, _} = IO.gets(io, message) |> String.trim() |> Integer.parse()
+      {status, result} = Board.mark(board, space, "X")
+
+      case {status, result} do
+        {:ok, result} -> ask_for_move(result, io)
+        {:error, result} -> ask_for_move(board, io, result <> " " <> @default_message)
+      end
     else
       board
     end
