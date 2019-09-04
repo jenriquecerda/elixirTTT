@@ -43,4 +43,10 @@ defmodule BoardTest do
   test "returns error when asked for mark on non-existing space" do
     assert Board.get(@empty_board, 4) == {:error, "Space 4 does not exist in board."}
   end
+
+  test "returns nil spaces" do
+    {:ok, board} = Board.mark(@empty_board, 2, "x")
+
+    assert Board.nil_spaces(board) == [1, 3]
+  end
 end
