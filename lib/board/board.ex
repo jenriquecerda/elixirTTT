@@ -38,4 +38,28 @@ defmodule Board do
   def size(board) do
     map_size(board)
   end
+
+  def nil_spaces(board) do
+    nil_spaces =
+      Enum.map(
+        board,
+        fn x ->
+          {space, _} = x
+          {_, mark} = Board.get(board, space)
+
+          if is_nil(mark) do
+            space
+          else
+            nil
+          end
+        end
+      )
+
+    Enum.filter(
+      nil_spaces,
+      fn x ->
+        !is_nil(x)
+      end
+    )
+  end
 end

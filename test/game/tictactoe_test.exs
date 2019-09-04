@@ -2,45 +2,40 @@ defmodule TicTacToeTest do
   use ExUnit.Case
   doctest TicTacToe
 
-  @empty_board Board.create(3)
-  @players ["x", "o"]
+  @board Board.create(9)
 
-  test "asks for spaces until board is full" do
-    fake_IO = spawn(FakeDevice, :receive_input, [["1", "2", "3"]])
+  test "humans can play" do
+    chooser = spawn(FakeInput, :receive_input, [["1", "2", "3", "4", "5", "6", "7", "8", "9"]])
 
-    updated_board = TicTacToe.start(@players, @empty_board, fake_IO, FakeScreen)
+    player_one = Player.new("X", Human, chooser)
+    player_two = Player.new("O", Human, chooser)
 
-    assert Board.get(updated_board, 1) == {:ok, "x"}
-    assert Board.get(updated_board, 2) == {:ok, "o"}
-    assert Board.get(updated_board, 3) == {:ok, "x"}
+    players = [player_one, player_two]
+
+    updated_board = TicTacToe.play_game(@board, players)
+
+    assert Board.get(updated_board, 1) == {:ok, "X"}
+    assert Board.get(updated_board, 2) == {:ok, "O"}
+    assert Board.get(updated_board, 3) == {:ok, "X"}
   end
 
-  test "asks again if chosen space is occupied" do
-    fake_IO = spawn(FakeDevice, :receive_input, [["1", "1", "2", "3"]])
+  # test "cpu can play" do
+  #   player_one = Player.new("X", CPU, chooser)
+  #   player_two = Player.new("O", CPU, chooser)
 
-    updated_board = TicTacToe.start(@players, @empty_board, fake_IO, FakeScreen)
+  #   players = [player_one, player_two]
 
-    assert Board.get(updated_board, 1) == {:ok, "x"}
-    assert Board.get(updated_board, 2) == {:ok, "o"}
-    assert Board.get(updated_board, 3) == {:ok, "x"}
-  end
+  #   updated_board = TicTacToe.play_game(@board, players)
 
-  test "asks again if chosen space does not exist" do
-    fake_IO = spawn(FakeDevice, :receive_input, [["99", "1", "2", "3"]])
-
-    updated_board = TicTacToe.start(@players, @empty_board, fake_IO, FakeScreen)
-
-    assert Board.get(updated_board, 1) == {:ok, "x"}
-    assert Board.get(updated_board, 2) == {:ok, "o"}
-    assert Board.get(updated_board, 3) == {:ok, "x"}
-  end
+  #   assert Board.is_full?(updated_board) == true
+  # end
 end
 
-defmodule FakeDevice do
+defmodule FakeInput do
   def receive_input(list) do
     receive do
       {:io_request, caller, reply_as, {_, _, message}} ->
-        case String.contains?(message, "Please") do
+        case String.contains?(message, "Please choose space") do
           true ->
             {number, list} = List.pop_at(list, 0)
             send(caller, {:io_reply, reply_as, number})
@@ -51,10 +46,5 @@ defmodule FakeDevice do
             receive_input(list)
         end
     end
-  end
-end
-
-defmodule FakeScreen do
-  def to_string(_board) do
   end
 end

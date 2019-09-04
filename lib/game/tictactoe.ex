@@ -1,27 +1,13 @@
 defmodule TicTacToe do
-  @default_message "Please choose space.\n"
-
-  def start(players, board, io \\ :stdio, screen) do
-    ask_for_move(players, board, io, screen)
-  end
-
-  defp ask_for_move(players, board, io, screen, message \\ @default_message) do
+  def play_game(board, players) do
     [current_player, _] = players
 
     unless Board.is_full?(board) do
-      {space, _} = IO.gets(io, message) |> String.trim() |> Integer.parse()
-      {status, result} = Board.mark(board, space, current_player)
+      {:ok, board} =
+        current_player.mode.choose(board, current_player.symbol, current_player.chooser)
 
-      case {status, result} do
-        {:ok, result} ->
-          IO.puts(io, screen.to_string(result))
-
-          players = Swapper.swap(players)
-          ask_for_move(players, result, io, screen)
-
-        {:error, result} ->
-          ask_for_move(players, board, io, screen, result <> " " <> @default_message)
-      end
+      players = Swapper.swap(players)
+      play_game(board, players)
     else
       board
     end
