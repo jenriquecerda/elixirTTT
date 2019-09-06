@@ -15,7 +15,7 @@ defmodule Board do
 
   def mark(board, space, mark) do
     cond do
-      space > size(board) ->
+      space > size(board) || space == 0 ->
         {:error, "Space " <> Integer.to_string(space) <> " does not exist in board."}
 
       board[space] != nil ->
@@ -26,11 +26,11 @@ defmodule Board do
     end
   end
 
-  def is_full?(board) do
+  def is_full(board) do
     !Enum.any?(
       board,
-      fn {key, value} ->
-        value == nil
+      fn {_key, value} ->
+        is_nil(value)
       end
     )
   end
@@ -39,7 +39,7 @@ defmodule Board do
     map_size(board)
   end
 
-  def nil_spaces(board) do
+  def blank_spaces(board) do
     nil_spaces =
       Enum.map(
         board,
