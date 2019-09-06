@@ -6,7 +6,7 @@ defmodule BoardPresenter do
         fn {k, _v} ->
           {:ok, value} = Board.get(board, k)
 
-          if value == nil do
+          if is_nil(value) do
             " "
           else
             value

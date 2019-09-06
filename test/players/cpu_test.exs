@@ -2,14 +2,14 @@ defmodule CPUTest do
   use ExUnit.Case
   doctest CPU
 
-  @empty_board Board.create(4)
+  test "returns random empty seletion" do
+    board = Board.create(3)
+    player = Player.new("X", nil, nil)
 
-  test "cpu updates board with selection" do
-    {:ok, board} = Board.mark(@empty_board, 1, "x")
-    {:ok, board} = Board.mark(board, 2, "o")
+    {:ok, board} = Board.mark(board, 1, "X")
 
-    {:ok, chosen_board} = CPU.choose(board, "@")
+    {:ok, updated_board} = CPU.function(board, player)
 
-    assert Board.nil_spaces(chosen_board) == [3] || [4]
+    assert Board.get(updated_board, 2) || Board.get(updated_board, 3) == {:ok, nil}
   end
 end

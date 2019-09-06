@@ -23,13 +23,13 @@ defmodule BoardTest do
   end
 
   test "checks if board has empty spaces" do
-    assert Board.is_full?(@empty_board) == false
+    assert Board.is_full(@empty_board) == false
 
     {:ok, board} = Board.mark(@empty_board, 1, "X")
     {:ok, board} = Board.mark(board, 2, "x")
     {:ok, board} = Board.mark(board, 3, "x")
 
-    assert Board.is_full?(board) == true
+    assert Board.is_full(board)
   end
 
   test "returns board size" do
@@ -47,6 +47,6 @@ defmodule BoardTest do
   test "returns nil spaces" do
     {:ok, board} = Board.mark(@empty_board, 2, "x")
 
-    assert Board.nil_spaces(board) == [1, 3]
+    assert Board.blank_spaces(board) == [1, 3]
   end
 end
