@@ -26,7 +26,7 @@ defmodule Board do
     end
   end
 
-  def is_full(board) do
+  def is_full?(board) do
     !Enum.any?(
       board,
       fn {_key, value} ->

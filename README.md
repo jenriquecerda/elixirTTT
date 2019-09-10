@@ -1,6 +1,12 @@
 # Tictactoe
 
-**TODO: Add description**
+**To run game build it with ```mix escripts.build```**\
+**Run game: ```./tictactoe```**
+
+By default game plays human vs human.
+
+Winning combinations are kept under the module "WinnerLogic". It will check if any of the combinations has repeated symbol, if so, there is a winner.
+
 
 ## Installation
 

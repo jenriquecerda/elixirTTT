@@ -2,14 +2,21 @@ defmodule CPUTest do
   use ExUnit.Case
   doctest CPU
 
-  test "returns random empty seletion" do
-    board = Board.create(3)
-    player = Player.new("X", nil, nil)
+  @board Board.create(9)
+  @symbol "X"
 
-    {:ok, board} = Board.mark(board, 1, "X")
+  test "marks random space in board" do
+    {_, marked_board} = CPU.mark(@board, @symbol)
+    assert Enum.count(Board.blank_spaces(marked_board)) == 8
+  end
 
-    {:ok, updated_board} = CPU.function(board, player)
+  test "symbol gets randomly marked in board" do
+    all_spaces = Board.blank_spaces(@board)
 
-    assert Board.get(updated_board, 2) || Board.get(updated_board, 3) == {:ok, nil}
+    {_, marked_board} = CPU.mark(@board, @symbol)
+
+    blank_spaces = Board.blank_spaces(marked_board)
+    [marked_space] = all_spaces -- blank_spaces
+    assert Board.get(marked_board, marked_space) == {:ok, @symbol}
   end
 end

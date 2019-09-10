@@ -23,14 +23,13 @@ defmodule HumanTest do
   test "human cant repeat selection" do
     fake_input = spawn(FakeInput, :receive_input, [["1", "2", "3", "4", "5", "6", "7", "8", "9"]])
     new_board = Board.create(9)
-    player = Player.new("x", nil, fake_input)
 
-    {:ok, board} = Board.mark(new_board, 1, player.symbol)
-    {:ok, board} = Board.mark(board, 2, player.symbol)
+    {:ok, board} = Board.mark(new_board, 1, "x")
+    {:ok, board} = Board.mark(board, 2, "x")
 
-    {:ok, should_be} = Board.mark(new_board, 1, player.symbol)
+    {:ok, should_be} = Board.mark(new_board, 1, "x")
 
-    assert {:ok, board} == Human.function(should_be, player)
+    assert {:ok, board} == Human.mark(should_be, "x", fake_input)
   end
 
   test "human cant enter out of bounds selection" do
@@ -38,14 +37,13 @@ defmodule HumanTest do
       spawn(FakeInput, :receive_input, [["0", "99", "1", "2", "3", "4", "5", "6", "7", "8", "9"]])
 
     new_board = Board.create(9)
-    player = Player.new("x", nil, fake_input)
 
-    {:ok, board} = Board.mark(new_board, 1, player.symbol)
-    {:ok, board} = Board.mark(board, 2, player.symbol)
+    {:ok, board} = Board.mark(new_board, 1, "x")
+    {:ok, board} = Board.mark(board, 2, "x")
 
-    {:ok, should_be} = Board.mark(new_board, 1, player.symbol)
+    {:ok, should_be} = Board.mark(new_board, 1, "x")
 
-    assert {:ok, board} == Human.function(should_be, player)
+    assert {:ok, board} == Human.mark(should_be, "x", fake_input)
   end
 
   test "human cant enter anything else than a number" do
@@ -53,10 +51,9 @@ defmodule HumanTest do
       spawn(FakeInput, :receive_input, [["d", "\n", "1", "2", "3", "4", "5", "6", "7", "8", "9"]])
 
     new_board = Board.create(9)
-    player = Player.new("x", nil, fake_input)
 
-    {:ok, board} = Board.mark(new_board, 1, player.symbol)
+    {:ok, board} = Board.mark(new_board, 1, "x")
 
-    assert {:ok, board} == Human.function(new_board, player)
+    assert {:ok, board} == Human.mark(new_board, "x", fake_input)
   end
 end
