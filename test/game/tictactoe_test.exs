@@ -40,7 +40,7 @@ defmodule TicTacToeTest do
 
   test "ends when there is a winner" do
     p1 = fn board -> Board.mark(board, 1, "X") end
-    p2 = fn board -> CPU.mark(board, "O") end
+    p2 = fn board -> CPU.mark(board, "O", &Chooser.choose/1) end
 
     players = [p1, p2]
 
@@ -93,9 +93,46 @@ defmodule TicTacToeTest do
     assert winning_message() == "Player X wins"
   end
 
+  @tag timeout: :infinity
+  @tag :skip
+  test "CPU never loses with minimax" do
+    spawn(TicTacToeTest, :test_game, [self])
+    spawn(TicTacToeTest, :test_game, [self])
+    spawn(TicTacToeTest, :test_game, [self])
+    spawn(TicTacToeTest, :test_game, [self])
+    spawn(TicTacToeTest, :test_game, [self])
+    spawn(TicTacToeTest, :test_game, [self])
+    spawn(TicTacToeTest, :test_game, [self])
+
+    receive do
+      {:done, true} ->
+        true
+    end
+  end
+
+  def test_game(pid) do
+    option_one = fn board -> Board.blank_spaces(board) end
+    player_one = fn board -> CPU.mark(board, "O", &Chooser.choose/1, option_one) end
+
+    option_two = fn board -> MiniMax.options(&Fake.winner/1, board, ["X", "O"]) end
+    player_two = fn board -> CPU.mark(board, "X", &Chooser.choose/1, option_two) end
+
+    players = [player_one, player_two]
+
+    for x <- 0..750 do
+      board = Board.create(9)
+      board = TicTacToe.play_game(board, players, WinningRules)
+      assert WinningRules.winner(board) != "O"
+    end
+
+    send(pid, {:done, true})
+  end
+
   defp prepare_players(symbol_one, symbol_two) do
-    p1 = fn board -> CPU.mark(board, symbol_one) end
-    p2 = fn board -> CPU.mark(board, symbol_two) end
+    options = fn board -> Board.blank_spaces(board) end
+
+    p1 = fn board -> CPU.mark(board, symbol_one, &Chooser.choose/1, options) end
+    p2 = fn board -> CPU.mark(board, symbol_two, &Chooser.choose/1, options) end
 
     [p1, p2]
   end
