@@ -26,18 +26,21 @@ defmodule WinningRules do
 
   def winner(board) do
     if has_winner?(board) do
-      [winner] =
-        Enum.filter(
-          Enum.map(
-            @winner_combinations,
-            fn combination ->
-              if check_for_winner(combination, board) do
-                combination
-              end
+      winning_combination =
+        Enum.map(
+          @winner_combinations,
+          fn combination ->
+            if check_for_winner(combination, board) do
+              combination
             end
-          ),
-          fn x ->
-            !is_nil(x)
+          end
+        )
+
+      winner =
+        Enum.find(
+          winning_combination,
+          fn combination ->
+            !is_nil(combination)
           end
         )
 

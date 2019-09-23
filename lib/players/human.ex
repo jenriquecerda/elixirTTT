@@ -1,5 +1,7 @@
 defmodule Human do
   def mark(board, symbol, device \\ :stdio) do
+    IO.puts(BoardPresenter.to_string(board))
+
     input =
       IO.gets(device, "#{symbol} Please choose space.\n")
       |> String.trim()
