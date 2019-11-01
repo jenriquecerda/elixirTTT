@@ -28,12 +28,13 @@ defmodule TicTacToeTest do
   end
 
   @board Board.create(9)
-  @output spawn(FakeIO, :receive_input, [])
+  @fake_device spawn(FakeIO, :receive_input, [])
 
   test "marks with users selection" do
     players = prepare_players("X", "O")
 
-    updated_board = TicTacToe.play_game(@board, players, NeverWins, @output)
+    output = fn message -> Output.print(message, @fake_device) end
+    updated_board = TicTacToe.play_game(@board, players, NeverWins, output)
 
     assert Board.is_full?(updated_board)
   end
@@ -51,7 +52,8 @@ defmodule TicTacToeTest do
     {:ok, winner_board} = Board.mark(winner_board, 2, "X")
     {:ok, winner_board} = Board.mark(winner_board, 3, "X")
 
-    assert TicTacToe.play_game(board, players, WinsOnTop, @output) == winner_board
+    output = fn message -> Output.print(message, @fake_device) end
+    assert TicTacToe.play_game(board, players, WinsOnTop, output) == winner_board
   end
 
   test "can't play on a board with a winner" do
@@ -61,7 +63,8 @@ defmodule TicTacToeTest do
     {:ok, board} = Board.mark(board, 2, "X")
     {:ok, board} = Board.mark(board, 3, "X")
 
-    assert TicTacToe.play_game(board, players, WinsOnTop, @output) == board
+    output = fn message -> Output.print(message, @fake_device) end
+    assert TicTacToe.play_game(board, players, WinsOnTop, output) == board
   end
 
   test "prints draw message" do
@@ -76,7 +79,8 @@ defmodule TicTacToeTest do
     {:ok, board} = Board.mark(board, 7, "X")
     {:ok, board} = Board.mark(board, 8, "O")
 
-    TicTacToe.play_game(board, players, NeverWins, @output)
+    output = fn message -> Output.print(message, @fake_device) end
+    TicTacToe.play_game(board, players, NeverWins, output)
 
     assert winning_message() == "Draw"
   end
@@ -88,7 +92,8 @@ defmodule TicTacToeTest do
     {:ok, board} = Board.mark(board, 2, "X")
     {:ok, board} = Board.mark(board, 3, "X")
 
-    TicTacToe.play_game(board, players, WinsOnTop, @output)
+    output = fn message -> Output.print(message, @fake_device) end
+    TicTacToe.play_game(board, players, WinsOnTop, output)
 
     assert winning_message() == "Player X wins"
   end
@@ -96,13 +101,13 @@ defmodule TicTacToeTest do
   @tag timeout: :infinity
   @tag :skip
   test "CPU never loses with minimax" do
-    spawn(TicTacToeTest, :test_game, [self])
-    spawn(TicTacToeTest, :test_game, [self])
-    spawn(TicTacToeTest, :test_game, [self])
-    spawn(TicTacToeTest, :test_game, [self])
-    spawn(TicTacToeTest, :test_game, [self])
-    spawn(TicTacToeTest, :test_game, [self])
-    spawn(TicTacToeTest, :test_game, [self])
+    spawn(TicTacToeTest, :test_game, [self()])
+    spawn(TicTacToeTest, :test_game, [self()])
+    spawn(TicTacToeTest, :test_game, [self()])
+    spawn(TicTacToeTest, :test_game, [self()])
+    spawn(TicTacToeTest, :test_game, [self()])
+    spawn(TicTacToeTest, :test_game, [self()])
+    spawn(TicTacToeTest, :test_game, [self()])
 
     receive do
       {:done, true} ->
@@ -119,9 +124,11 @@ defmodule TicTacToeTest do
 
     players = [player_one, player_two]
 
+    output = fn message -> Output.print(message, @fake_device) end
+
     for x <- 0..750 do
       board = Board.create(9)
-      board = TicTacToe.play_game(board, players, WinningRules)
+      board = TicTacToe.play_game(board, players, WinningRules, output)
       assert WinningRules.winner(board) != "O"
     end
 
