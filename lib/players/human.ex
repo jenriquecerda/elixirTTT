@@ -1,26 +1,18 @@
 defmodule Human do
-  def mark(board, symbol, device \\ :stdio) do
-    IO.puts(BoardPresenter.to_string(board))
+  def mark(board, symbol, input) do
+    user_input = input.()
 
-    input =
-      IO.gets(device, "#{symbol} Please choose space.\n")
-      |> String.trim()
-      |> Integer.parse()
-
-    if input == :error do
-      mark(board, symbol, device)
+    if user_input == :error do
+      mark(board, symbol, input)
     else
-      {space, _} = input
-
-      {status, result} = Board.mark(board, space, symbol)
+      {status, result} = Board.mark(board, user_input, symbol)
 
       case {status, result} do
         {:ok, result} ->
-          IO.puts(device, BoardPresenter.to_string(result))
           {status, result}
 
         {:error, _} ->
-          mark(board, symbol, device)
+          mark(board, symbol, input)
       end
     end
   end

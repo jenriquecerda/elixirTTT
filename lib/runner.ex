@@ -1,15 +1,24 @@
 defmodule Runner do
   def main(_argv) do
+    current_path = "/home/quique/Dynamic/Elixir/tictactoe"
+
+    human_symbol = "O"
+    cpu_symol = "X"
+
     board = Board.create(9)
 
-    player_one = fn board -> Human.mark(board, "O") end
+    human_input = FifoInput.get(String.to_charlist(current_path <> "/in"))
 
-    options = fn board -> Board.blank_spaces(board) end
-    # options = fn board -> MiniMax.options(&WinningRules.winner/1, board, ["X", "O"]) end
-    player_two = fn board -> CPU.mark(board, "X", &Chooser.choose/1, options) end
+    cpu_input = fn board ->
+      MiniMax.options(&WinningRules.winner/1, board, [cpu_symol, human_symbol])
+    end
 
-    players = Enum.shuffle([player_one, player_two])
+    output = FifoOutput.print(String.to_charlist(current_path <> "/out"))
 
-    IO.puts(BoardPresenter.to_string(TicTacToe.play_game(board, players, WinningRules)))
+    player_one = fn board -> Human.mark(board, human_symbol, human_input) end
+    player_two = fn board -> CPU.mark(board, cpu_symol, &Chooser.choose/1, cpu_input) end
+    players = [player_one, player_two]
+
+    board = TicTacToe.play_game(board, players, WinningRules, output)
   end
 end

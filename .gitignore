@@ -23,3 +23,5 @@ erl_crash.dump
 tictactoe-*.tar
 
 tictactoe
+out
+out
