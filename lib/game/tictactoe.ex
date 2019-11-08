@@ -2,7 +2,7 @@ defmodule TicTacToe do
   def play_game(board, players, winning_rules, output) do
     [current_player, _] = players
 
-    output.(BoardPresenter.to_string(board))
+    output.(board)
 
     unless Board.is_full?(board) || winning_rules.has_winner?(board) do
       {:ok, marked_board} = current_player.(board)

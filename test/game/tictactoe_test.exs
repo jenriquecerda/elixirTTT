@@ -30,6 +30,7 @@ defmodule TicTacToeTest do
   @board Board.create(9)
   @fake_device spawn(FakeIO, :receive_input, [])
 
+  @tag :skip
   test "marks with users selection" do
     players = prepare_players("X", "O")
 
@@ -39,6 +40,7 @@ defmodule TicTacToeTest do
     assert Board.is_full?(updated_board)
   end
 
+  @tag :skip
   test "ends when there is a winner" do
     p1 = fn board -> Board.mark(board, 1, "X") end
     p2 = fn board -> CPU.mark(board, "O", &Chooser.choose/1) end
@@ -56,6 +58,7 @@ defmodule TicTacToeTest do
     assert TicTacToe.play_game(board, players, WinsOnTop, output) == winner_board
   end
 
+  @tag :skip
   test "can't play on a board with a winner" do
     players = prepare_players("X", "O")
 
@@ -67,6 +70,7 @@ defmodule TicTacToeTest do
     assert TicTacToe.play_game(board, players, WinsOnTop, output) == board
   end
 
+  @tag :skip
   test "prints draw message" do
     players = prepare_players("X", "O")
 
@@ -85,6 +89,7 @@ defmodule TicTacToeTest do
     assert String.ends_with?(winning_message(), "Draw") == true
   end
 
+  @tag :skip
   test "prints winners symbols" do
     players = prepare_players("X", "O")
 
